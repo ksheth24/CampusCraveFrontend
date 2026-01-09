@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import SignedOutNav from "../SignedOutNav";
 
 export default function VerifyEmailPage() {
   const [code, setCode] = React.useState<string[]>(["", "", "", "", "", ""]);
@@ -59,23 +60,7 @@ export default function VerifyEmailPage() {
     
     <main className="min-h-screen bg-gray-50">
       {/* Navbar */}
-      <nav className="flex items-center justify-between px-8 py-4 bg-white shadow-sm">
-        <div className="flex items-center gap-2 text-xl font-bold text-red-500">
-          🍜 <span>CampusCrave</span>
-        </div>
-
-        <div className="flex items-center gap-6 text-sm font-medium">
-          <a href="#" className="text-gray-700 hover:text-black">
-            Browse Meals
-          </a>
-          <a href="/login" className="text-gray-700 hover:text-black">
-            Login
-          </a>
-          <a href="/register" className="px-4 py-2 text-white bg-red-400 rounded-lg hover:bg-red-500">
-            Sign Up
-          </a>
-        </div>
-      </nav>
+      <SignedOutNav />
 
       {/* Verify Card */}
       <section className="flex justify-center mt-20">
