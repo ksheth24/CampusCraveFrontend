@@ -49,7 +49,7 @@ export default function SellerNav() {
               <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
                 <a href = "/browse"><button className="hover:text-gray-900 transition">Browse Meals</button></a>
                 <button className="hover:text-gray-900 transition">My Orders</button>
-                <a href = "/seller_dashboard"><button className="hover:text-gray-900 transition">My Listings</button></a>
+                <a href = "/seller/seller_dashboard"><button className="hover:text-gray-900 transition">My Listings</button></a>
                 <button className="hover:text-gray-900 transition">Incoming Orders</button>
               </div>
     

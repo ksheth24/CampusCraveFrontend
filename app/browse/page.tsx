@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import SignedInNav from "../SignedInNav";
 import SignedOutNav from "../SignedOutNav";
 import SellerNav from "../SellerNav";
+import { useRouter } from "next/navigation";
 
 
 type Listing = {
@@ -131,8 +132,11 @@ export default function BrowsePage() {
 }
 
 function ListingCard({ listing }: { listing: Listing }) {
+  const router = useRouter();
   return (
-    <div className="group bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-xl transition overflow-hidden">
+    <div 
+    onClick={() => router.push(`/listing/${listing.id}`)}
+    className="group bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-xl transition overflow-hidden">
       {/* Image */}
       <div className="relative">
         <img

@@ -35,9 +35,11 @@ export default function SignedOutHome() {
                 <p className="text-gray-600 mb-5">
                   Discover affordable, homemade meals near you
                 </p>
+                <a href = "/browse">
                 <button className="px-6 py-3 rounded-xl bg-teal-500 text-white font-semibold hover:bg-teal-600 transition">
                   Browse Meals
                 </button>
+                </a>
               </div>
 
               {/* Sellers */}
@@ -48,11 +50,12 @@ export default function SignedOutHome() {
                 <p className="text-gray-600 mb-5">
                   Share your cooking and earn money on campus
                 </p>
+                <a href = "auth/register">
                 <button className="px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 text-white font-semibold hover:opacity-90 transition">
                   Sign Up to Sell
                 </button>
+                </a>
               </div>
-
             </div>
           </div>
 

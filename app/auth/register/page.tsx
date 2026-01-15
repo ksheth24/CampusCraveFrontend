@@ -2,8 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import SignedOutNav from "../SignedOutNav";
-
+import SignedOutNav from "@/app/SignedOutNav";
 
 export default function RegisterPage() {
   const [username, setUsername] = React.useState("");
@@ -39,7 +38,7 @@ export default function RegisterPage() {
       }
 
       if (response.ok) {
-        router.push("/verify-email");
+        router.push("/auth/verify-email");
       }
       
     } catch (error: any) {
@@ -154,7 +153,7 @@ export default function RegisterPage() {
           {/* Footer */}
           <p className="mt-6 text-center text-sm text-gray-600">
             Already have an account?{" "}
-            <a href="/login" className="text-red-400 hover:underline">
+            <a href="/auth/login" className="text-red-400 hover:underline">
               Login
             </a>
           </p>

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import SellerNav from "./SellerNav";
+import { useEffect } from "react";
+
 const submit = async () => {
     try {
       const response = await fetch("http://localhost:8080/api/auth/logout", {
@@ -33,8 +35,39 @@ type SignedInHomeProps = {
     user: string;
   }
 
+  type Listing = {
+    id: number;
+    title: string;
+    price: number;
+    pickupLocation: string;
+  };
+
 export default function SellerSignedInHome({user} : SignedInHomeProps) {
+    
     const [menuOpen, setMenuOpen] = useState(false);
+    const [listings, setListings] = useState<Listing[]>([]);
+    const [loading, setLoading] = useState(true);
+
+
+    useEffect(() => {
+      const fetchListings = async () => {
+        try {
+          const res = await fetch(
+            "http://localhost:8080/api/listing/getSellerListings",
+            { credentials: "include" }
+          );
+          if (!res.ok) throw new Error("Failed to fetch listings");
+          const data = await res.json();
+          setListings(data);
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchListings();
+    }, []);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-pink-50">
@@ -64,7 +97,7 @@ export default function SellerSignedInHome({user} : SignedInHomeProps) {
                     <p className="text-gray-600 mb-5">
                       Create, edit, or pause your meal listings
                     </p>
-                    <a href = "/seller_dashboard">
+                    <a href = "/seller/seller_dashboard">
                     <button className="px-6 py-3 rounded-xl bg-teal-500 text-white font-semibold hover:bg-teal-600 transition">
                       Manage Listings
                     </button>
@@ -89,7 +122,7 @@ export default function SellerSignedInHome({user} : SignedInHomeProps) {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white rounded-2xl shadow border border-gray-100 p-6">
                   <p className="text-sm text-gray-500">Active Listings</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-1">3</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-1">{listings.length}</p>
                 </div>
     
                 <div className="bg-white rounded-2xl shadow border border-gray-100 p-6">
@@ -102,7 +135,6 @@ export default function SellerSignedInHome({user} : SignedInHomeProps) {
                   <p className="text-3xl font-bold text-green-600 mt-1">$128</p>
                 </div>
               </div>
-    
             </div>
           </main>
         </div>

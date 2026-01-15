@@ -3,6 +3,7 @@
 import { useState } from "react";
 import  React from "react";
 import { useRouter } from "next/navigation";
+import SignedOutNav from "@/app/SignedOutNav";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -47,32 +48,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-pink-50">
-      {/* Navbar */}
-      <nav className="w-full bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <a href = "/">
-          <div className="flex items-center gap-2 text-xl font-bold">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">
-              🍜 CampusCrave
-            </span>
-          </div>
-          </a>
-          <div className="flex items-center gap-6 text-sm">
-            <a href="/" className="text-gray-600 hover:text-black">
-              Browse Meals
-            </a>
-            <a href="/login" className="text-gray-600 hover:text-black">
-              Login
-            </a>
-            <a href = "register">
-            <button className="px-4 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 text-white font-semibold hover:opacity-90 transition">
-              Sign Up
-            </button>
-            </a>
-            
-          </div>
-        </div>
-      </nav>
+      <SignedOutNav />
 
       {/* Login Card */}
       <div className="flex justify-center items-center mt-24 px-4">
@@ -128,7 +104,7 @@ export default function LoginPage() {
           </form>
 
           {/* Footer */}
-          <a href = "/register">
+          <a href = "/auth/register">
           <p className="text-sm text-center text-gray-600 mt-4">
             Don't have an account?{" "}
             <span className="text-red-500 hover:underline cursor-pointer">

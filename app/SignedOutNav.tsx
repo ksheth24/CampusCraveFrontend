@@ -19,13 +19,13 @@ export default function SignedOutNav() {
               Browse Meals
             </button>
             </a>
-            <a href = "/login">
+            <a href = "/auth/login">
             <button className="text-gray-600 hover:text-gray-900 transition">
               Login
             </button>
             </a>
 
-            <a href = "register">
+            <a href = "/auth/register">
             <button className="px-4 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 text-white font-semibold hover:opacity-90 transition">
               Sign Up
             </button>
