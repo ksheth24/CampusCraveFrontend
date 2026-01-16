@@ -124,7 +124,6 @@ export default function ListingDetailPage() {
                 You’ll confirm quantity & pickup time next
               </p>
             </div>
-  
           </div>
         </div>
       </div>

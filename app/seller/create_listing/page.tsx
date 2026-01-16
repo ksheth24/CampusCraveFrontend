@@ -11,6 +11,7 @@ export default function CreateListingPage() {
   const [ingredients, setIngredients] = useState("");
   const [price, setPrice] = useState("");
   const [pickUpLocation, setPickUpLocation]  = useState("");
+  const [photo, setPhoto] = useState<File | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const router = useRouter();
@@ -20,37 +21,22 @@ export default function CreateListingPage() {
     setLoading(true);
     setError(null);
 
-    try {
-      const response = await fetch("http://localhost:8080/api/listing/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          title,
-          description,
-          ingredients, 
-          price, 
-          pickUpLocation, 
-        }),
-      });
+    if (!photo) return alert("Upload a photo");
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("ingredients", ingredients);
+    formData.append("price", price.toString());
+    formData.append("pickUpLocation", pickUpLocation);
+    formData.append("photo", photo);
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Listing Creation Failed");
-      }
-
-      if (response.ok) {
-        router.push("/");
-      }
-      
-    } catch (error: any) {
-      console.error("Fetch error:", error);
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
+    const res = await fetch("http://localhost:8080/api/listing/create", {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
+  
+    if (!res.ok) throw new Error("Create failed");
   };
 
   return (
@@ -126,6 +112,9 @@ export default function CreateListingPage() {
                            file:text-sm file:font-medium
                            file:bg-gray-100 file:text-gray-700
                            hover:file:bg-gray-200"
+                accept="image/*"
+                onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
+                         
               />
             </div>
 
