@@ -2,35 +2,36 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import SignedInNav from "@/app/SignedInNav";
+import SignedOutNav from "@/app/SignedOutNav";
+import SellerNav from "@/app/SellerNav";
 
 type ListingInfo = {
   id: number;
   title: string;
   description: string;
-  ingredients: string;
+  ingredients: string; // comma-separated string
   price: number;
   pickupLocation: string;
+  photo: string;
 };
 
 export default function ListingDetailPage() {
   const { id } = useParams();
   const [listing, setListing] = useState<ListingInfo | null>(null);
   const [loading, setLoading] = useState(true);
+  const [username, setUsername] = useState<string | null>(null);
+  const [isVerifiedSeller, setIsVerifiedSeller] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchListing = async () => {
       try {
         const res = await fetch(
-          `http://localhost:8080/api/listing/get/${id}`, {
-            method: "GET",
-            credentials: "include",
-        });
-        if (!res.ok) {
-          throw new Error("Failed to fetch listing");
-        }
-
-        const data = await res.json();
-        setListing(data);
+          `http://localhost:8080/api/listing/get/${id}`,
+          { method: "GET", credentials: "include" }
+        );
+        if (!res.ok) throw new Error("Failed to fetch listing");
+        setListing(await res.json());
       } catch (err) {
         console.error(err);
       } finally {
@@ -38,12 +39,42 @@ export default function ListingDetailPage() {
       }
     };
 
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/api/auth/check", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        setUsername(data.username);
+      } catch {
+        setUsername(null);
+      }
+    };
+
+    const checkVerifiedSeller = async () => {
+      try {
+        const res = await fetch(
+          "http://localhost:8080/api/user/verifiedSeller",
+          { method: "GET", credentials: "include" }
+        );
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        setIsVerifiedSeller(data.verified);
+      } catch {
+        setIsVerifiedSeller(false);
+      }
+    };
+
     fetchListing();
+    checkAuth();
+    checkVerifiedSeller();
   }, [id]);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-white to-pink-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#FFF8F3]">
         <div className="animate-spin h-6 w-6 border-2 border-orange-500 border-t-transparent rounded-full" />
       </div>
     );
@@ -58,75 +89,128 @@ export default function ListingDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-pink-50 px-6 py-12">
-      <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-        
-        {/* IMAGE / HERO */}
-        <div className="relative">
+    <main className="min-h-screen bg-[#FFF8F3]">
+      {/* ================= NAV ================= */}
+      {username ? (
+        isVerifiedSeller ? <SellerNav /> : <SignedInNav />
+      ) : (
+        <SignedOutNav />
+      )}
+
+      {/* ================= HERO IMAGE ================= */}
+      <section className="relative max-w-7xl mx-auto px-6 pt-10">
+        <div className="relative overflow-hidden rounded-[32px] shadow-2xl">
           <img
-            src="/placeholder-meal.jpg"
-            alt="Meal"
-            className="w-full h-72 object-cover"
+            src={listing.photo}
+            alt={listing.title}
+            className="h-[420px] w-full object-cover"
           />
-  
-          {/* Price Badge */}
-          <div className="absolute top-5 right-5 bg-white/90 backdrop-blur px-4 py-2 rounded-full shadow text-lg font-bold text-orange-500">
+
+          {/* gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+
+          {/* PRICE BADGE */}
+          <div className="absolute top-6 right-6 rounded-full bg-white px-5 py-2 font-bold text-lg text-[#FF6A3D] shadow">
             ${listing.price.toFixed(2)}
           </div>
-        </div>
-  
-        {/* CONTENT */}
-        <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-          
-          {/* LEFT: MAIN INFO */}
-          <div className="md:col-span-2">
-            <h1 className="text-3xl font-extrabold text-gray-900">
+
+          {/* TITLE OVER IMAGE */}
+          <div className="absolute bottom-6 left-6">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-white drop-shadow">
               {listing.title}
             </h1>
-  
-            <p className="mt-4 text-gray-600 leading-relaxed">
+            <p className="mt-1 text-white/90">
+              Homemade • Student Seller
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= CONTENT ================= */}
+      <section className="max-w-7xl mx-auto px-6 py-14 grid lg:grid-cols-[2fr_1fr] gap-12">
+        {/* ========== LEFT COLUMN ========== */}
+        <div>
+          {/* DESCRIPTION */}
+          <div className="bg-white rounded-3xl shadow-md p-8">
+            <h2 className="text-2xl font-bold mb-4">
+              About this meal
+            </h2>
+            <p className="text-gray-700 leading-relaxed">
               {listing.description}
             </p>
-  
-            {/* INGREDIENTS */}
-            <div className="mt-8">
-              <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-800 mb-2">
-                Ingredients
-              </h3>
-              <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
-                {listing.ingredients}
-              </div>
+          </div>
+
+          {/* INGREDIENTS */}
+          <div className="mt-8 bg-white rounded-3xl shadow-md p-8">
+            <h2 className="text-2xl font-bold mb-4">
+              Ingredients
+            </h2>
+
+            <div className="flex flex-wrap gap-3">
+              {listing.ingredients
+                .split(",")
+                .map((item, i) => (
+                  <span
+                    key={i}
+                    className="rounded-full bg-[#FFF3EA] px-4 py-2 text-sm font-semibold text-gray-700"
+                  >
+                    {item.trim()}
+                  </span>
+                ))}
             </div>
           </div>
-  
-          {/* RIGHT: META + CTA */}
-          <div className="space-y-6">
-            
+        </div>
+
+        {/* ========== RIGHT COLUMN (STICKY CTA) ========== */}
+        <aside className="lg:sticky lg:top-24 h-fit">
+          <div className="bg-white rounded-3xl shadow-xl p-8">
+            {/* PRICE */}
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500 text-sm">
+                Price
+              </span>
+              <span className="text-3xl font-extrabold text-[#FF6A3D]">
+                ${listing.price.toFixed(2)}
+              </span>
+            </div>
+
             {/* PICKUP LOCATION */}
-            <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5">
-              <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">
+            <div className="mt-6 rounded-2xl border border-gray-200 p-4">
+              <p className="text-sm text-gray-500 mb-1">
                 Pickup Location
               </p>
-              <p className="text-sm font-medium text-gray-800">
+              <p className="font-semibold">
                 📍 {listing.pickupLocation}
               </p>
             </div>
-  
-            {/* ACTION */}
-            <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-orange-50 to-pink-50 p-5">
-              <button
-                className="w-full rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 py-3 text-white font-semibold shadow-md hover:opacity-90 transition"
-              >
-                Place Order
-              </button>
-  
-              <p className="mt-3 text-xs text-center text-gray-500">
-                You’ll confirm quantity & pickup time next
+
+            {/* SELLER INFO */}
+            <div className="mt-6 rounded-2xl bg-[#FFF8F3] p-4">
+              <p className="text-sm text-gray-500">
+                Seller
+              </p>
+              <p className="font-semibold">
+                ⭐ 4.8 • Verified Student
               </p>
             </div>
+
+            {/* CTA */}
+            <button
+              onClick={() => alert("wire order / chat logic")}
+              className="mt-8 w-full py-4 rounded-2xl font-semibold text-white
+                         bg-gradient-to-r from-[#FF6A3D] to-[#FF2F92]
+                         hover:scale-[1.02] active:scale-[0.99]
+                         transition shadow-lg"
+            >
+              Reserve Meal
+            </button>
+
+            <p className="mt-4 text-xs text-center text-gray-500">
+              You’ll coordinate pickup after reserving.
+            </p>
           </div>
-        </div>
-      </div>
-    </div>
+        </aside>
+      </section>
+    </main>
   );
 }

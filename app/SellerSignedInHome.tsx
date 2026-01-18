@@ -1,142 +1,170 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SellerNav from "./SellerNav";
-import { useEffect } from "react";
-
-const submit = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/auth/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Logout failed");
-      }
-      
-      // Force a full page reload to ensure auth state is re-checked
-      window.location.href = "/";
-      
-    } catch (error: any) {
-      console.error("Fetch error:", error);
-      // Even on error, try to reload to clear any stale state
-      window.location.href = "/";
-    }
-  };
+import { useRouter } from "next/navigation";
 
 type SignedInHomeProps = {
-    user: string;
-  }
+  user: string;
+};
 
-  type Listing = {
-    id: number;
-    title: string;
-    price: number;
-    pickupLocation: string;
+type Listing = {
+  id: number;
+  title: string;
+  price: number;
+  pickupLocation: string;
+};
+
+export default function SellerSignedInHome({ user }: SignedInHomeProps) {
+  const router = useRouter();
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        const res = await fetch(
+          "http://localhost:8080/api/listing/getSellerListings",
+          { credentials: "include" }
+        );
+        if (!res.ok) throw new Error("Failed to fetch listings");
+        const data = await res.json();
+        setListings(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchListings();
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#FFF3EC] via-[#FFE9F1] to-[#FFF8F3]">
+      {/* HEADER (UNCHANGED) */}
+      <SellerNav />
+
+      {/* CONTENT */}
+      <main className="max-w-7xl mx-auto px-6 py-20">
+        <div className="grid lg:grid-cols-2 gap-20 items-center">
+
+          {/* ================= LEFT: TEXT ================= */}
+          <section>
+            <span className="inline-block mb-4 rounded-full bg-orange-100 px-4 py-1 text-sm font-semibold text-orange-600">
+              Seller Portal
+            </span>
+
+            <h1 className="text-5xl font-extrabold leading-tight text-gray-900">
+              Run your food<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">
+                business on campus
+              </span>
+            </h1>
+
+            <p className="mt-6 text-lg text-gray-600 max-w-xl">
+              Manage listings, handle incoming orders, and track your earnings —
+              all from one place.
+            </p>
+
+            <div className="mt-10 flex flex-wrap gap-4">
+              <button
+                onClick={() => router.push("/seller/listings/new")}
+                className="px-8 py-4 rounded-xl font-semibold text-white
+                           bg-gradient-to-r from-orange-500 to-pink-500
+                           hover:scale-[1.02] transition shadow-lg"
+              >
+                Create New Listing
+              </button>
+
+              <button
+                onClick={() => router.push("/seller/seller_dashboard")}
+                className="px-8 py-4 rounded-xl font-semibold
+                           border border-orange-400 text-orange-600
+                           hover:bg-orange-50 transition"
+              >
+                Manage Listings
+              </button>
+            </div>
+          </section>
+
+          {/* ================= RIGHT: NAV CARDS ================= */}
+          <section className="grid sm:grid-cols-2 gap-8">
+            <NavCard
+              title="My Listings"
+              description="Edit, pause, or remove meals you’ve posted."
+              accent="orange"
+              onClick={() => router.push("/seller/seller_dashboard")}
+            />
+
+            <NavCard
+              title="Incoming Orders"
+              description="View orders that need to be prepared."
+              accent="pink"
+              onClick={() => router.push("/seller/incoming_orders")}
+            />
+
+            <NavCard
+              title="Earnings"
+              description="Track payouts and total revenue."
+              accent="green"
+              onClick={() => router.push("/seller/earnings")}
+            />
+
+            <NavCard
+              title="Profile & Settings"
+              description="Update seller info and preferences."
+              accent="gray"
+              onClick={() => router.push("/seller/profile")}
+            />
+          </section>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+/* ================= NAV CARD ================= */
+
+function NavCard({
+  title,
+  description,
+  accent,
+  onClick,
+}: {
+  title: string;
+  description: string;
+  accent: "orange" | "pink" | "green" | "gray";
+  onClick: () => void;
+}) {
+  const accentMap = {
+    orange: "from-orange-400 to-orange-500",
+    pink: "from-orange-400 to-pink-500",
+    green: "from-green-400 to-green-500",
+    gray: "from-gray-400 to-gray-600",
   };
 
-export default function SellerSignedInHome({user} : SignedInHomeProps) {
-    
-    const [menuOpen, setMenuOpen] = useState(false);
-    const [listings, setListings] = useState<Listing[]>([]);
-    const [loading, setLoading] = useState(true);
+  return (
+    <button
+      onClick={onClick}
+      className="group text-left bg-white rounded-3xl p-8
+                 shadow-md hover:shadow-xl transition"
+    >
+      <div
+        className={`h-2 w-16 rounded-full bg-gradient-to-r ${accentMap[accent]} mb-6`}
+      />
 
+      <h3 className="text-xl font-bold mb-2">
+        {title}
+      </h3>
 
-    useEffect(() => {
-      const fetchListings = async () => {
-        try {
-          const res = await fetch(
-            "http://localhost:8080/api/listing/getSellerListings",
-            { credentials: "include" }
-          );
-          if (!res.ok) throw new Error("Failed to fetch listings");
-          const data = await res.json();
-          setListings(data);
-        } catch (err) {
-          console.error(err);
-        } finally {
-          setLoading(false);
-        }
-      };
-  
-      fetchListings();
-    }, []);
+      <p className="text-gray-600">
+        {description}
+      </p>
 
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-pink-50">
-    
-          {/* NAVBAR (SAME STYLE AS USER HOME) */}
-          <SellerNav/>
-    
-          {/* PAGE CONTENT */}
-          <main className="px-6 py-12">
-            <div className="max-w-6xl mx-auto space-y-10">
-    
-              {/* HERO */}
-              <div className="bg-white rounded-2xl shadow-xl border border-gray-100 px-10 py-12 text-center">
-                <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">
-                  Seller Dashboard
-                </h1>
-    
-                <p className="mt-4 text-gray-600 text-lg">
-                  Manage your listings and fulfill incoming orders
-                </p>
-    
-                <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="rounded-xl border border-gray-100 p-6 hover:shadow-md transition">
-                    <p className="text-sm font-semibold text-teal-500 mb-1">
-                      📦 My Listings
-                    </p>
-                    <p className="text-gray-600 mb-5">
-                      Create, edit, or pause your meal listings
-                    </p>
-                    <a href = "/seller/seller_dashboard">
-                    <button className="px-6 py-3 rounded-xl bg-teal-500 text-white font-semibold hover:bg-teal-600 transition">
-                      Manage Listings
-                    </button>
-                    </a>
-                  </div>
-    
-                  <div className="rounded-xl border border-gray-100 p-6 hover:shadow-md transition">
-                    <p className="text-sm font-semibold text-pink-500 mb-1">
-                      🔔 Incoming Orders
-                    </p>
-                    <p className="text-gray-600 mb-5">
-                      Review and prepare meals for pickup
-                    </p>
-                    <button className="px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 text-white font-semibold hover:opacity-90 transition">
-                      View Orders
-                    </button>
-                  </div>
-                </div>
-              </div>
-    
-              {/* QUICK STATS */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white rounded-2xl shadow border border-gray-100 p-6">
-                  <p className="text-sm text-gray-500">Active Listings</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-1">{listings.length}</p>
-                </div>
-    
-                <div className="bg-white rounded-2xl shadow border border-gray-100 p-6">
-                  <p className="text-sm text-gray-500">Incoming Orders</p>
-                  <p className="text-3xl font-bold text-orange-500 mt-1">2</p>
-                </div>
-    
-                <div className="bg-white rounded-2xl shadow border border-gray-100 p-6">
-                  <p className="text-sm text-gray-500">Total Earnings</p>
-                  <p className="text-3xl font-bold text-green-600 mt-1">$128</p>
-                </div>
-              </div>
-            </div>
-          </main>
-        </div>
-      );
+      <p className="mt-6 font-semibold text-orange-500 group-hover:underline">
+        Go →
+      </p>
+    </button>
+  );
 }
