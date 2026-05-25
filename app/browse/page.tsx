@@ -25,7 +25,7 @@ export default function BrowsePage() {
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/listing/getListings");
+        const res = await fetch("http://localhost:8081/api/listing/getListings");
         if (!res.ok) throw new Error("Failed to fetch listings");
         const data = await res.json();
         setListings(data);
@@ -38,7 +38,7 @@ export default function BrowsePage() {
 
     const checkAuth = async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/auth/check", {
+        const res = await fetch("http://localhost:8081/api/auth/check", {
           method: "GET",
           credentials: "include",
         });
@@ -52,7 +52,7 @@ export default function BrowsePage() {
 
     const checkVerifiedSeller = async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/user/verifiedSeller", {
+        const res = await fetch("http://localhost:8081/api/user/verifiedSeller", {
           method: "GET",
           credentials: "include", // 🔥 REQUIRED for cookies
         });
@@ -74,7 +74,7 @@ export default function BrowsePage() {
 
   const submit = async () => {
     try {
-      await fetch("http://localhost:8080/api/auth/logout", {
+      await fetch("http://localhost:8081/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });

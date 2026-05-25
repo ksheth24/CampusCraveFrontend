@@ -36,7 +36,7 @@ export default function VerifyEmailPage() {
 
     try {
       // 🔁 Replace with your real endpoint
-      const res = await fetch("http://localhost:8080/api/auth/verify-email", {
+      const res = await fetch("http://localhost:8081/api/auth/verify-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code: verificationCode }),

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useEffect } from "react";
+import Link from "next/link";
 
 export default function SignedInNav() {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -8,7 +9,7 @@ export default function SignedInNav() {
 
     const logout = async () => {
         try {
-          await fetch("http://localhost:8080/api/auth/logout", {
+          await fetch("http://localhost:8081/api/auth/logout", {
             method: "POST",
             credentials: "include",
           });
@@ -20,7 +21,7 @@ export default function SignedInNav() {
     useEffect(() => {   
         const checkAuth = async () => {
           try {
-            const res = await fetch("http://localhost:8080/api/auth/check", {
+            const res = await fetch("http://localhost:8081/api/auth/check", {
               method: "GET",
               credentials: "include",
             });
@@ -39,19 +40,19 @@ export default function SignedInNav() {
         <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           {/* Logo */}
-          <a href = "/">
+          <Link href="/">
               <div className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">
                 🍜 CampusCrave
               </div>
-          </a>
+          </Link>
 
           {/* Links */}
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
-            <button className="hover:text-gray-900">Browse Meals</button>
-            <button className="hover:text-gray-900">My Orders</button>
-            <a href="/verify_seller" className="hover:text-gray-900">
+            <Link href="/browse" className="hover:text-gray-900">Browse Meals</Link>
+            <Link href="/orders" className="hover:text-gray-900">My Orders</Link>
+            <Link href="/auth/verify_seller" className="hover:text-gray-900">
               Become a Seller
-            </a>
+            </Link>
           </div>
 
           {/* User Menu */}

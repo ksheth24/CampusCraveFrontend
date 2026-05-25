@@ -1,65 +1,69 @@
 "use client";
 
-import SignedOutHome from "./SignedOutHome"
-import  SellerSignedInHome from "./SellerSignedInHome"
-import { useEffect } from "react";
-import React from "react";
-import { useState } from "react";
+import React, { useEffect } from "react";
 import SignedInHome from "./SignedInHome";
-
+import SignedOutHome from "./SignedOutHome";
+import SellerSignedInHome from "./SellerSignedInHome";
 
 export default function HomePage() {
-    const [loading, setLoading] = React.useState(true);
-    const [username, setUsername] = React.useState<string | null>(null);
-    const [isVerifiedSeller, setIsVerifiedSeller] = useState<boolean>(false);
+  const [loading, setLoading] = React.useState(true);
+  const [username, setUsername] = React.useState<string | null>(null);
+  const [isVerifiedSeller, setIsVerifiedSeller] = React.useState(false);
 
+  useEffect(() => {
+    const loadHomeState = async () => {
+      try {
+        const authRes = await fetch("http://localhost:8081/api/auth/check", {
+          method: "GET",
+          credentials: "include",
+        });
 
-    useEffect(() => {
-      const checkAuth = async () => {
-        try {
-          const res = await fetch("http://localhost:8080/api/auth/check", {
-            method: "GET",
-            credentials: "include", // 🔥 REQUIRED for cookies
-          });
-  
-          if (!res.ok) throw new Error("Not authenticated");
-  
-          const data = await res.json();
-          setUsername(data.username);
-        } catch {
-          setUsername(null);
-        } finally {
-          setLoading(false);
-        }
-      };
-      const checkVerifiedSeller = async () => {
-        try {
-          const res = await fetch("http://localhost:8080/api/user/verifiedSeller", {
-            method: "GET",
-            credentials: "include", // 🔥 REQUIRED for cookies
-          });
-  
-          if (!res.ok) throw new Error("Not authenticated");
-  
-          const data = await res.json();
-          setIsVerifiedSeller(data.verified);
-        } catch {
+        if (!authRes.ok) throw new Error("Not authenticated");
+
+        const authData = await authRes.json();
+        setUsername(authData.username);
+
+        const sellerRes = await fetch("http://localhost:8081/api/user/verifiedSeller", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!sellerRes.ok) {
           setIsVerifiedSeller(false);
-        } finally {
-          setLoading(false);
+          return;
         }
-      };
-      checkAuth();
-      checkVerifiedSeller();
-    }, []);
 
-    if (!username) {
-      return <SignedOutHome />;
-    }
-  
-    if (username && !isVerifiedSeller) {
-      return <SignedInHome user = {username}/>; 
-    }
+        const sellerData = await sellerRes.json();
+        setIsVerifiedSeller(Boolean(sellerData.verified));
+      } catch {
+        setUsername(null);
+        setIsVerifiedSeller(false);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return <SellerSignedInHome user = {username} />;
+    loadHomeState();
+  }, []);
+
+  if (loading) {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: "linear-gradient(135deg, #fff5f0 0%, #fff0f5 50%, #fce8f3 100%)" }}
+      >
+        <div className="animate-spin h-7 w-7 border-2 border-orange-500 border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (!username) {
+    return <SignedOutHome />;
+  }
+
+  if (!isVerifiedSeller) {
+    return <SignedInHome user={username} />;
+  }
+
+  return <SellerSignedInHome user={username} />;
 }

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useEffect } from "react";
+import Link from "next/link";
 
 export default function SellerNav() {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -8,7 +9,7 @@ export default function SellerNav() {
 
     const logout = async () => {
         try {
-          await fetch("http://localhost:8080/api/auth/logout", {
+          await fetch("http://localhost:8081/api/auth/logout", {
             method: "POST",
             credentials: "include",
           });
@@ -20,7 +21,7 @@ export default function SellerNav() {
     useEffect(() => {   
         const checkAuth = async () => {
           try {
-            const res = await fetch("http://localhost:8080/api/auth/check", {
+            const res = await fetch("http://localhost:8081/api/auth/check", {
               method: "GET",
               credentials: "include",
             });
@@ -39,18 +40,18 @@ export default function SellerNav() {
             <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
               
               {/* Logo */}
-              <a href = "/">
+              <Link href="/">
               <div className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">
                 🍜 CampusCrave
               </div>
-              </a>
+              </Link>
     
               {/* Nav Links */}
               <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
-                <a href = "/browse"><button className="hover:text-gray-900 transition">Browse Meals</button></a>
-                <button className="hover:text-gray-900 transition">My Orders</button>
-                <a href = "/seller/seller_dashboard"><button className="hover:text-gray-900 transition">My Listings</button></a>
-                <button className="hover:text-gray-900 transition">Incoming Orders</button>
+                <Link href="/browse" className="hover:text-gray-900 transition">Browse Meals</Link>
+                <Link href="/orders" className="hover:text-gray-900 transition">My Orders</Link>
+                <Link href="/seller/seller_dashboard" className="hover:text-gray-900 transition">My Listings</Link>
+                <Link href="/seller/incoming_orders" className="hover:text-gray-900 transition">Incoming Orders</Link>
               </div>
     
               {/* User Dropdown */}

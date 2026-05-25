@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import SellerNav from "./SellerNav";
 import { useRouter } from "next/navigation";
 
@@ -8,37 +7,8 @@ type SignedInHomeProps = {
   user: string;
 };
 
-type Listing = {
-  id: number;
-  title: string;
-  price: number;
-  pickupLocation: string;
-};
-
 export default function SellerSignedInHome({ user }: SignedInHomeProps) {
   const router = useRouter();
-  const [listings, setListings] = useState<Listing[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchListings = async () => {
-      try {
-        const res = await fetch(
-          "http://localhost:8080/api/listing/getSellerListings",
-          { credentials: "include" }
-        );
-        if (!res.ok) throw new Error("Failed to fetch listings");
-        const data = await res.json();
-        setListings(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchListings();
-  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFF3EC] via-[#FFE9F1] to-[#FFF8F3]">
@@ -52,7 +22,7 @@ export default function SellerSignedInHome({ user }: SignedInHomeProps) {
           {/* ================= LEFT: TEXT ================= */}
           <section>
             <span className="inline-block mb-4 rounded-full bg-orange-100 px-4 py-1 text-sm font-semibold text-orange-600">
-              Seller Portal
+              Seller Portal, {user}
             </span>
 
             <h1 className="text-5xl font-extrabold leading-tight text-gray-900">
@@ -69,7 +39,7 @@ export default function SellerSignedInHome({ user }: SignedInHomeProps) {
 
             <div className="mt-10 flex flex-wrap gap-4">
               <button
-                onClick={() => router.push("/seller/listings/new")}
+                onClick={() => router.push("/seller/create_listing")}
                 className="px-8 py-4 rounded-xl font-semibold text-white
                            bg-gradient-to-r from-orange-500 to-pink-500
                            hover:scale-[1.02] transition shadow-lg"
